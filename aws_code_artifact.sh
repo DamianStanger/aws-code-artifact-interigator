@@ -21,7 +21,6 @@ grep -Pe "\"($domain|@$domain)[^\"]+\"" aws_code_artifact.txt >> aws_code_artifa
 sed -i -E 's/.*": "//' aws_code_artifact_2.txt
 sed -i -E 's/"//' aws_code_artifact_2.txt
 
-exit 0
 
 cat aws_code_artifact_1.txt | while read line
 do
