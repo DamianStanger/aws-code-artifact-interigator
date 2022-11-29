@@ -6,10 +6,12 @@ rm -f aws_code_artifact_2.txt
 rm -f package_versions.txt
 rm -f this_versions.txt
 rm -f all_versions.txt
+rm -f all_package_versions.txt
 
 domain=$1
 domain_owner=$2
 
+echo "aws codeartifact list-packages"
 aws codeartifact list-packages --domain $domain --domain-owner $domain_owner --repository npm-private --profile saml >> aws_code_artifact.txt
 
 grep -A 1 -Pe "\"namespace\": \"$domain\"," aws_code_artifact.txt >> aws_code_artifact_1.txt
@@ -33,6 +35,8 @@ do
 
   grep -Pe '"version": "([0-9\.]+)",' package_versions.txt | grep -oPe "[0-9\.]+" >> this_versions.txt
 
+
+
   latest2=$(cat this_versions.txt | sort -V | tail -n 1)
 
   if [ "$latest1" = "$latest2" ]; then
@@ -43,6 +47,10 @@ do
   fi
 
   cat this_versions.txt | xargs echo "@$domain/$line" >> all_versions.txt
+  sed -i "s|^|@$domain/$line-|" this_versions.txt
+  sed -i "s/$/.tgz/" this_versions.txt
+
+  sort -V this_versions.txt >> all_package_versions.txt
 done
 
 
@@ -67,4 +75,8 @@ do
   fi
 
   cat this_versions.txt | xargs echo "$line" >> all_versions.txt
+  sed -i "s/^/$line-/" this_versions.txt
+  sed -i "s/$/.tgz/" this_versions.txt
+
+  sort -V this_versions.txt >> all_package_versions.txt
 done
